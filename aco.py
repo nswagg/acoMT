@@ -4,15 +4,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 from ant import Ant
 
-na = 50  # number of ants
-nt = 1  # number of targets
-nb = 1  # number of "home bases"/ ant colonies
-jump = .5  # distance an ant moves in a frame/epoch (speed)
+na = 50     # number of ants
+nt = 1      # number of targets
+nb = 1      # number of "home bases"/ ant colonies
+jump = .5   # distance an ant moves in a frame/epoch (speed)
+pheromoneDecay = 5  # decay rates in number of epochs
 ants: [Ant] = []
 
-sd = 1  # standard deviation
-mu = 0  # mean of angles (from -180 -> 180 degrees)
-dmin = 0  # minimum angle in degrees
+sd = 1      # standard deviation
+mu = 0      # mean of angles (from -180 -> 180 degrees)
+dmin = 0    # minimum angle in degrees
 dmax = 359  # maximum angle in degrees
 rng = np.random.default_rng(seed=37)
 rngNorm = np.random.normal(mu, sd)
@@ -47,6 +48,7 @@ def denormalize(norm, xmin=0, xmax=359):
 
 
 def wander(ant: Ant):
+    """wild ant function for moving through a space without a known target"""
     newAngle = denormalize(normalize(ant.getAngle()) + rngNorm)  # denormalized angle [0,359]
     ant.setCoords(newPoint(newAngle, ant.getSpeed()))
     ant.setAngle(newAngle)
