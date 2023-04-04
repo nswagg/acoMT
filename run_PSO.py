@@ -21,7 +21,7 @@ Y = np.arange(-5, 5, 0.05)
 meshgrid = np.meshgrid(X, Y)
 
 # where x0,y0 define the coordinate plane and x1,y1 define the target
-fe = lambda x0, y0, x1, y1: ((x0 - x1) ** 2 + (y0 - y1) ** 2) ** 0.5
+f = lambda x0, y0, x1, y1: ((x0 - x1) ** 2 + (y0 - y1) ** 2) ** 0.5
 
 
 def f0(x, y):
@@ -29,15 +29,12 @@ def f0(x, y):
     func_list = []
 
     for a in range(len(targets)):
-        func_list.append(fe(x, y, targets[a][0], targets[a][1]))
+        func_list.append(f(x, y, targets[a][0], targets[a][1]))
 
     min_list = func_list[0]
 
     for b in range(1, len(func_list)):
         min_list = np.minimum(min_list, func_list[b])
-    """func_a = fe(x, y, tg0[0], tg0[1])
-    func_b = fe(x, y, tg1[0], tg1[1])
-    func_c = fe(x, y, tg2[0], tg2[1])"""
 
     return min_list
 
