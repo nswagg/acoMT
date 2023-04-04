@@ -58,6 +58,7 @@ class PSO:
         r_1 = np.random.random(self.N)
         r_1 = np.tile(r_1[:, None], (1, 2))
         new_velocities += self.c_1 * r_1 * (self.p_bests - self.particles)
+
         # add social component
         r_2 = np.random.random(self.N)
         r_2 = np.tile(r_2[:, None], (1, 2))
@@ -78,6 +79,7 @@ class PSO:
             if fits[i] < self.p_bests_values[i]:
                 self.p_bests_values[i] = fits[i]
                 self.p_bests[i] = self.particles[i]
+
                 # update best global value (social)
                 if fits[i] < self.g_best_value:
                     self.g_best_value = fits[i]

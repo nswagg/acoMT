@@ -90,7 +90,7 @@ def plot_3d_pso(meshgrid, function, particles=None, velocity=None, normalize=Tru
 
     len_space = 10
     # Customize the axis
-    max_z = (np.max(Z_grid) // len_space + 1).astype(np.int) * len_space
+    max_z = (np.max(Z_grid) // len_space + 1).astype(int) * len_space
     ax.set_xlim3d(np.min(X_grid), np.max(X_grid))
     ax.set_ylim3d(np.min(Y_grid), np.max(Y_grid))
     ax.set_zlim3d(0, max_z)
