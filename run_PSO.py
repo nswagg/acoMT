@@ -42,7 +42,7 @@ particles = np.random.uniform(-5, 5, (n_particles, 2))
 velocities = (np.random.random((n_particles, 2)) - 0.5) / 10
 
 pso_1 = PSO(particles.copy(), velocities.copy(), fitness_function, T,
-            w=0.73, c_1=2.0, c_2=2.0, max_iter=100, auto_coef=False)
+            w=0.73, c_1=2.0, c_2=2.0, max_iter=50, auto_coef=False)
 
 root = 'src/'
 filename = '_tmp.gif'

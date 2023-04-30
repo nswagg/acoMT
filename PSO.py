@@ -3,11 +3,10 @@
 import sys
 import numpy as np
 
-
 class PSO:
 
     def __init__(self, particles, velocities, fitness_function, targets,
-                 w=0.8, c_1=1, c_2=1, max_iter=100, prox_dist=.5, carry=0.2, auto_coef=True):
+                 w=0.8, c_1=1, c_2=1, max_iter=100, prox_dist=.5, carry=0.01, auto_coef=True):
         self.particles = particles
         self.carry_cap = carry  # how much a particle can "carry" from target
         self.velocities = velocities
@@ -41,6 +40,7 @@ class PSO:
         if self.iter > 0:
             self.move_particles()
             self.update_bests()
+            self.update_target()
             self.update_coef()
 
         self.iter += 1
@@ -55,9 +55,18 @@ class PSO:
             self.c_1 = -3 * t / n + 3.5
             self.c_2 = 3 * t / n + 0.5
 
-    def update_target(self, count, target):  # count is the number of particles within decay_rad
+    def update_target(self):  # count is the number of particles within decay_rad
         """defines actions taken when targets are updating over time"""
-        target[2] = count * self.carry_cap
+        """For each particle within the target's range, increase the counter and decay the target
+           weight relative to each particle's carrying capacity.
+        """
+        for t in self.targets:
+            count = 0
+            for p in self.particles:
+                euclid = (p[0]-t[0])**2 + (p[1]-t[1])**2
+                if euclid < self.decay_rad:
+                    count += 1
+            t[2] = t[2] - (count * self.carry_cap) if t[2] - (count * self.carry_cap) > 0 else 0
 
     def move_particles(self):
 
