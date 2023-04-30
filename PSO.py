@@ -6,11 +6,13 @@ import numpy as np
 
 class PSO:
 
-    def __init__(self, particles, velocities, fitness_function,
-                 w=0.8, c_1=1, c_2=1, max_iter=100, auto_coef=True):
+    def __init__(self, particles, velocities, fitness_function, targets,
+                 w=0.8, c_1=1, c_2=1, max_iter=100, prox_dist=.5, carry=0.2, auto_coef=True):
         self.particles = particles
+        self.carry_cap = carry  # how much a particle can "carry" from target
         self.velocities = velocities
         self.fitness_function = fitness_function
+        self.targets = targets
 
         self.N = len(self.particles)
         self.w = w
@@ -18,6 +20,9 @@ class PSO:
         self.c_2 = c_2
         self.auto_coef = auto_coef
         self.max_iter = max_iter
+        # defines how many particles must be near a target to decay
+        self.decay_num = self.particles * (1 - self.w) if 0 < w <= 1 else self.particles
+        self.decay_rad = prox_dist  # radius from target for decay
 
         self.p_bests = self.particles
         self.p_bests_values = self.fitness_function(self.particles)
@@ -49,6 +54,10 @@ class PSO:
             self.w = (0.4 / n ** 2) * (t - n) ** 2 + 0.4
             self.c_1 = -3 * t / n + 3.5
             self.c_2 = 3 * t / n + 0.5
+
+    def update_target(self, count, target):  # count is the number of particles within decay_rad
+        """defines actions taken when targets are updating over time"""
+        target[2] = count * self.carry_cap
 
     def move_particles(self):
 
