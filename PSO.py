@@ -1,23 +1,28 @@
 # from https://towardsdatascience.com/particle-swarm-optimization-visually-explained-46289eeb2e14
 
-import sys
 import numpy as np
 
 
 class PSO:
 
-    def __init__(self, particles, velocities, fitness_function,
-                 w=0.8, c_1=1, c_2=1, max_iter=100, auto_coef=True):
+    def __init__(self, particles, velocities, fitness_function, targets,
+                 w=0.8, c_1=1, c_2=1, max_iter=100, prox_dist=.1, carry=0.01, auto_coef=True):
         self.particles = particles
+        self.carry_cap = carry  # how much a particle can "carry" from target
         self.velocities = velocities
         self.fitness_function = fitness_function
+        self.targets = targets  # list of [x,y,w] tuples where x,y are coords and w is a weight
 
         self.N = len(self.particles)
         self.w = w
         self.c_1 = c_1
         self.c_2 = c_2
+
         self.auto_coef = auto_coef
         self.max_iter = max_iter
+        # defines how many particles must be near a target to decay
+        self.decay_num = self.N * (1 - self.w) if 0 < w <= 1 else self.N
+        self.decay_rad = prox_dist  # radius from target for decay
 
         self.p_bests = self.particles
         self.p_bests_values = self.fitness_function(self.particles)
@@ -27,6 +32,7 @@ class PSO:
 
         self.iter = 0
         self.is_running = True
+        self.has_targets = len(self.targets) > 0
         self.update_coef()
 
     def __str__(self):
@@ -37,9 +43,10 @@ class PSO:
             self.move_particles()
             self.update_bests()
             self.update_coef()
+            self.update_target()
 
         self.iter += 1
-        self.is_running = self.is_running and self.iter < self.max_iter
+        self.is_running = self.is_running and self.has_targets and self.iter < self.max_iter
         return self.is_running
 
     def update_coef(self):
@@ -49,6 +56,28 @@ class PSO:
             self.w = (0.4 / n ** 2) * (t - n) ** 2 + 0.4
             self.c_1 = -3 * t / n + 3.5
             self.c_2 = 3 * t / n + 0.5
+
+    def update_target(self):  # count is the number of particles within decay_rad
+        """defines actions taken when targets are updating over time"""
+        """For each particle within the target's range, increase the counter and decay the target
+           weight relative to each particle's carrying capacity."""
+        a = 0
+        while a < len(self.targets):
+            count = 0
+            for p in self.particles:
+                euclid = (p[0] - self.targets[a][0]) ** 2 + (p[1] - self.targets[a][1]) ** 2
+                if euclid < self.decay_rad:
+                    count += 1
+            if count >= self.decay_num:  # requires "convergence" on the target before decay
+                self.targets[a][2] = self.targets[a][2] - (count * self.carry_cap) \
+                    if self.targets[a][2] - (count * self.carry_cap) > 0 else 0
+            if self.targets[a][2] <= 0:
+                self.remove_target(a)
+                a = 0
+                self.reset()
+            else:
+                a += 1
+            print(self.targets)
 
     def move_particles(self):
 
@@ -84,3 +113,21 @@ class PSO:
                 if fits[i] < self.g_best_value:
                     self.g_best_value = fits[i]
                     self.g_best = self.particles[i]
+
+    def remove_target(self, index):
+        if len(self.targets) > 1:
+            del self.targets[index]
+        # This should flag when attempting to remove target, but only 1 target left
+        elif len(self.targets) == 1:
+            self.has_targets = False
+
+    def reset(self):
+        """If target decays away, reset the swarm to search for other targets."""
+        # randomize velocities again
+        self.velocities = ((np.random.random((self.N, 2)) - 0.5) / 10).copy()
+
+        self.p_bests = self.particles
+        self.p_bests_values = self.fitness_function(self.particles)
+        self.g_best = self.p_bests[0]
+        self.g_best_value = self.p_bests_values[0]
+        self.update_bests()

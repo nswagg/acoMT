@@ -7,13 +7,9 @@ from PSO import PSO
 from utils import plot_2d_pso, plot_3d_pso, make_gif_from_folder
 
 n_particles = 100
-targets = [[-2, 2],
-           [3, 2],
-           [-4, -1]]
-
-tg0 = np.array([-2, 2])
-tg1 = np.array([3, -2])
-tg2 = np.array([-2, -2])
+T = [[4, -4, 6],
+     [3, 1, 1],
+     [-4, -2, 3]]
 
 # Make range grid
 X = np.arange(-5, 5, 0.05)
@@ -21,21 +17,18 @@ Y = np.arange(-5, 5, 0.05)
 meshgrid = np.meshgrid(X, Y)
 
 # where x0,y0 define the coordinate plane and x1,y1 define the target
-f = lambda x0, y0, x1, y1: ((x0 - x1) ** 2 + (y0 - y1) ** 2) ** 0.5
+f = lambda x0, y0, x1, y1, w: (((x0 - x1) ** 2 + (y0 - y1) ** 2) ** 0.5) - w
 
 
 def f0(x, y):
     """ minimization function for n targets"""
     func_list = []
+    for a in range(len(T)):
+        func_list.append(f(x, y, T[a][0], T[a][1], T[a][2]))
 
-    for a in range(len(targets)):
-        func_list.append(f(x, y, targets[a][0], targets[a][1]))
-
-    min_list = func_list[0]
-
-    for b in range(1, len(func_list)):
+    min_list = func_list[0] if len(func_list) > 0 else np.zeros((200, 200))
+    for b in range(0, len(func_list)):
         min_list = np.minimum(min_list, func_list[b])
-
     return min_list
 
 
@@ -44,10 +37,10 @@ def fitness_function(pos):
     return f0(x, y)
 
 
-particles = np.random.uniform(-5, 5, (n_particles, 2))
+# particles = np.random.uniform(-5, 5, (n_particles, 2))
+particles = np.random.uniform(0, 0, (n_particles, 2))
 velocities = (np.random.random((n_particles, 2)) - 0.5) / 10
-
-pso_1 = PSO(particles.copy(), velocities.copy(), fitness_function,
+pso_1 = PSO(particles.copy(), velocities.copy(), fitness_function, T,
             w=0.73, c_1=2.0, c_2=2.0, max_iter=100, auto_coef=False)
 
 root = 'src/'
@@ -70,7 +63,6 @@ while pso_1.next():
     ax = fig.add_subplot(1, 3, 1)
     plot_2d_pso(meshgrid, f0, pso_1.particles, pso_1.velocities, ax=ax)
     ax.set_title(str(pso_1))
-
     if save_path is None:
         plt.show()
     else:
