@@ -29,9 +29,15 @@ f = lambda x0, y0, x1, y1, w: (((x0 - x1) ** 2 + (y0 - y1) ** 2) ** 0.5) - w
 def f0(x, y):
     """ minimization function for n targets"""
     func_list = []
-    for a in range(len(T)):
-        if T[a][2] != 0:
+    a = 0
+    while a < len(T):
+        if T[a][2] == 0:
+            del T[a]
+            a = 0
+        else:
             func_list.append(f(x, y, T[a][0], T[a][1], T[a][2]))
+            a += 1
+        print(T)
 
     min_list = func_list[0] if func_list[0] is not None else None
     for b in range(1, len(func_list)):
@@ -45,10 +51,9 @@ def fitness_function(pos):
     return f0(x, y)
 
 
-# particles = np.random.uniform(-5, 5, (n_particles, 2))
-particles = np.random.uniform(0, 0, (n_particles, 2))
+particles = np.random.uniform(-5, 5, (n_particles, 2))
+# particles = np.random.uniform(0, 0, (n_particles, 2))
 velocities = (np.random.random((n_particles, 2)) - 0.5) / 10
-print("0: " + str(id(T)))
 pso_1 = PSO(particles.copy(), velocities.copy(), fitness_function, T,
             w=0.73, c_1=2.0, c_2=2.0, max_iter=100, auto_coef=False)
 

@@ -6,7 +6,7 @@ import numpy as np
 class PSO:
 
     def __init__(self, particles, velocities, fitness_function, targets,
-                 w=0.8, c_1=1, c_2=1, max_iter=100, prox_dist=.1, carry=0.01, auto_coef=True):
+                 w=0.8, c_1=1, c_2=1, max_iter=100, prox_dist=.2, carry=0.05, auto_coef=True):
         self.particles = particles
         self.carry_cap = carry  # how much a particle can "carry" from target
         self.velocities = velocities
@@ -20,8 +20,8 @@ class PSO:
         self.c_1 = c_1
         self.c_2_0 = 0 + c_2
         self.c_2 = c_2
-        print("c1_0: " + str(id(self.c_1_0)) + " " + str(self.c_1_0))
-        print("c1: " + str(id(self.c_1)) + " " + str(self.c_1))
+        # print("c1_0: " + str(id(self.c_1_0)) + " " + str(self.c_1_0))
+        # print("c1: " + str(id(self.c_1)) + " " + str(self.c_1))
 
         self.auto_coef = auto_coef
         self.max_iter = max_iter
@@ -46,11 +46,12 @@ class PSO:
         if self.iter > 0:
             self.move_particles()
             self.update_bests()
-            self.update_target()
+
             self.update_coef()
+            self.update_target()
 
         self.iter += 1
-        self.is_running = self.is_running and self.iter < self.max_iter
+        self.is_running = self.is_running and self.iter < self.max_iter and len(self.targets) > 0
         return self.is_running
 
     def update_coef(self):
@@ -74,7 +75,7 @@ class PSO:
                     count += 1
             if count >= self.decay_num:  # requires "convergence" on the target before decay
                 t[2] = t[2] - (count * self.carry_cap) if t[2] - (count * self.carry_cap) > 0 else 0
-            if t[2] >= 0:
+            if t[2] == 0:
                 # self.remove_target(t)
                 self.reset()
 
@@ -121,5 +122,6 @@ class PSO:
         self.c_1 = 0 + self.c_1_0
         self.c_2 = 0 + self.c_2_0
         self.w = 0 + self.w_init
+        self.iter = 0
         # randomize velocities again
         self.velocities = (np.random.random((self.N, 2)) - 0.5) / 10
