@@ -20,7 +20,7 @@ def make_gif_from_folder(folder, out_file_path, remove_folder=True):
     shutil.rmtree(folder, ignore_errors=True)
 
 
-plt.rcParams['figure.figsize'] = [12, 6]  # default = [6.0, 4.0]
+plt.rcParams['figure.figsize'] = [12, 12]  # default = [6.0, 4.0]
 plt.rcParams['figure.dpi'] = 100  # default = 72.0
 plt.rcParams['font.size'] = 7.5  # default = 10.0
 
