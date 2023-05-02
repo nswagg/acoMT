@@ -1,8 +1,5 @@
 # from https://towardsdatascience.com/particle-swarm-optimization-visually-explained-46289eeb2e14
-import sys
-
 import numpy as np
-from TARGET import TARGET
 
 
 class PSO:
@@ -43,9 +40,9 @@ class PSO:
     def next(self):
         if self.iter > 0:
             self.move_particles()
+            self.update_target()
             self.update_bests()
             self.update_coef()
-            self.update_target()
 
         self.iter += 1
         self.is_running = self.is_running and self.has_targets and self.iter < self.max_iter
@@ -59,13 +56,11 @@ class PSO:
             self.c_1 = -3 * t / n + 3.5
             self.c_2 = 3 * t / n + 0.5
 
-    def update_target(self):  # count is the number of particles within decay_rad
+    def update_target(self):
         """defines actions taken when targets are updating over time"""
-        """For each particle within the target's range, increase the counter and decay the target
-           weight relative to each particle's carrying capacity."""
-        a = 0
+        a = 0  # keeps track of index
         while a < len(self.targets):
-            count = 0
+            count = 0  # count is the number of particles within decay_rad
             for p in self.particles:
                 euclid = (p[0] - self.targets[a].x) ** 2 + (p[1] - self.targets[a].y) ** 2
                 if euclid < self.decay_rad:
@@ -78,10 +73,9 @@ class PSO:
                 a = 0
                 self.reset()
             else:
+                self.targets[a].next()
                 a += 1
             print(self.targets)
-            """ for i in self.targets:
-                i.print_target()"""
 
     def move_particles(self):
 
@@ -134,4 +128,4 @@ class PSO:
         self.p_bests_values = self.fitness_function(self.particles)
         self.g_best = self.p_bests[0]
         self.g_best_value = self.p_bests_values[0]
-        self.update_bests()
+        # self.update_bests()

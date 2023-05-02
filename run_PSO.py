@@ -1,6 +1,4 @@
 import os
-import sys
-import time
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -11,7 +9,7 @@ from utils import plot_2d_pso, plot_3d_pso, make_gif_from_folder
 n_particles = 100
 T = [TARGET(4, -4, 6),
      TARGET(3, 1, 1),
-     TARGET(-4, -2, 3)]
+     TARGET(-4, -2, 3, animate=0)]
 
 # Make range grid
 X = np.arange(-10, 10, 0.1)
@@ -41,11 +39,15 @@ def fitness_function(pos):
 
 def main():
 
-    # particles = np.random.uniform(-5, 5, (n_particles, 2))
-    particles = np.random.uniform(0, 0, (n_particles, 2))
+    particles = np.random.uniform(-5, 5, (n_particles, 2))
+    # particles = np.random.uniform(0, 0, (n_particles, 2))
     velocities = (np.random.random((n_particles, 2)) - 0.5) / 10
-    pso_1 = PSO(particles.copy(), velocities.copy(), fitness_function, T,
+    pso_1 = PSO(particles.copy(), velocities.copy(), fitness_function, T.copy(),
+                w=0.25, c_1=2.0, c_2=2.0, max_iter=100, auto_coef=False)
+    pso_2 = PSO(particles.copy(), velocities.copy(), fitness_function, T.copy(),
                 w=0.73, c_1=2.0, c_2=2.0, max_iter=100, auto_coef=False)
+    pso_3 = PSO(particles.copy(), velocities.copy(), fitness_function, T.copy(),
+                w=0.9, c_1=2.0, c_2=2.0, max_iter=100, auto_coef=False)
 
     root = 'src/'
     filename = '_tmp.gif'
@@ -59,14 +61,29 @@ def main():
     fig = plt.figure()
 
     while pso_1.next():
+        """pso_2.next()
+        pso_3.next()"""
         fig.clear()
         save_path = None if not save else os.path.join(tmp_dir, f'{pso_1.iter:05d}.png')
 
-        ax = fig.add_subplot(1, 2, 2, projection='3d')
+        ax = fig.add_subplot(1, 3, 2, projection='3d')
         plot_3d_pso(meshgrid, f0, pso_1.particles, pso_1.velocities, ax=ax)
         ax = fig.add_subplot(1, 3, 1)
         plot_2d_pso(meshgrid, f0, pso_1.particles, pso_1.velocities, ax=ax)
         ax.set_title(str(pso_1))
+
+        """ax = fig.add_subplot(1, 3, 2, projection='3d')
+        plot_3d_pso(meshgrid, f0, pso_1.particles, pso_1.velocities, ax=ax)
+        ax = fig.add_subplot(1, 3, 1)
+        plot_2d_pso(meshgrid, f0, pso_1.particles, pso_1.velocities, ax=ax)
+        ax.set_title(str(pso_1))
+
+        ax = fig.add_subplot(1, 3, 2, projection='3d')
+        plot_3d_pso(meshgrid, f0, pso_1.particles, pso_1.velocities, ax=ax)
+        ax = fig.add_subplot(1, 3, 1)
+        plot_2d_pso(meshgrid, f0, pso_1.particles, pso_1.velocities, ax=ax)
+        ax.set_title(str(pso_1))"""
+
         if save_path is None:
             plt.show()
         else:
