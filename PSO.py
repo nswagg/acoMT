@@ -1,6 +1,8 @@
 # from https://towardsdatascience.com/particle-swarm-optimization-visually-explained-46289eeb2e14
+import sys
 
 import numpy as np
+from TARGET import TARGET
 
 
 class PSO:
@@ -11,7 +13,7 @@ class PSO:
         self.carry_cap = carry  # how much a particle can "carry" from target
         self.velocities = velocities
         self.fitness_function = fitness_function
-        self.targets = targets  # list of [x,y,w] tuples where x,y are coords and w is a weight
+        self.targets = targets  # list of TARGET objs
 
         self.N = len(self.particles)
         self.w = w
@@ -65,19 +67,21 @@ class PSO:
         while a < len(self.targets):
             count = 0
             for p in self.particles:
-                euclid = (p[0] - self.targets[a][0]) ** 2 + (p[1] - self.targets[a][1]) ** 2
+                euclid = (p[0] - self.targets[a].x) ** 2 + (p[1] - self.targets[a].y) ** 2
                 if euclid < self.decay_rad:
                     count += 1
             if count >= self.decay_num:  # requires "convergence" on the target before decay
-                self.targets[a][2] = self.targets[a][2] - (count * self.carry_cap) \
-                    if self.targets[a][2] - (count * self.carry_cap) > 0 else 0
-            if self.targets[a][2] == 0 and self.has_targets:
+                self.targets[a].weight = self.targets[a].weight - (count * self.carry_cap) \
+                    if self.targets[a].weight - (count * self.carry_cap) > 0 else 0
+            if self.targets[a].weight == 0 and self.has_targets:
                 self.remove_target(a)
                 a = 0
                 self.reset()
             else:
                 a += 1
             print(self.targets)
+            """ for i in self.targets:
+                i.print_target()"""
 
     def move_particles(self):
 
