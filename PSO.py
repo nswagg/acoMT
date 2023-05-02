@@ -1,5 +1,4 @@
 # from https://towardsdatascience.com/particle-swarm-optimization-visually-explained-46289eeb2e14
-
 import numpy as np
 
 
@@ -11,7 +10,7 @@ class PSO:
         self.carry_cap = carry  # how much a particle can "carry" from target
         self.velocities = velocities
         self.fitness_function = fitness_function
-        self.targets = targets  # list of [x,y,w] tuples where x,y are coords and w is a weight
+        self.targets = targets  # list of TARGET objs
 
         self.N = len(self.particles)
         self.w = w
@@ -41,9 +40,9 @@ class PSO:
     def next(self):
         if self.iter > 0:
             self.move_particles()
+            self.update_target()
             self.update_bests()
             self.update_coef()
-            self.update_target()
 
         self.iter += 1
         self.is_running = self.is_running and self.has_targets and self.iter < self.max_iter
@@ -57,25 +56,24 @@ class PSO:
             self.c_1 = -3 * t / n + 3.5
             self.c_2 = 3 * t / n + 0.5
 
-    def update_target(self):  # count is the number of particles within decay_rad
+    def update_target(self):
         """defines actions taken when targets are updating over time"""
-        """For each particle within the target's range, increase the counter and decay the target
-           weight relative to each particle's carrying capacity."""
-        a = 0
+        a = 0  # keeps track of index
         while a < len(self.targets):
-            count = 0
+            count = 0  # count is the number of particles within decay_rad
             for p in self.particles:
-                euclid = (p[0] - self.targets[a][0]) ** 2 + (p[1] - self.targets[a][1]) ** 2
+                euclid = (p[0] - self.targets[a].x) ** 2 + (p[1] - self.targets[a].y) ** 2
                 if euclid < self.decay_rad:
                     count += 1
             if count >= self.decay_num:  # requires "convergence" on the target before decay
-                self.targets[a][2] = self.targets[a][2] - (count * self.carry_cap) \
-                    if self.targets[a][2] - (count * self.carry_cap) > 0 else 0
-            if self.targets[a][2] == 0 and self.has_targets:
+                self.targets[a].weight = self.targets[a].weight - (count * self.carry_cap) \
+                    if self.targets[a].weight - (count * self.carry_cap) > 0 else 0
+            if self.targets[a].weight == 0 and self.has_targets:
                 self.remove_target(a)
                 a = 0
                 self.reset()
             else:
+                self.targets[a].next()
                 a += 1
             print(self.targets)
 
@@ -130,4 +128,4 @@ class PSO:
         self.p_bests_values = self.fitness_function(self.particles)
         self.g_best = self.p_bests[0]
         self.g_best_value = self.p_bests_values[0]
-        self.update_bests()
+        # self.update_bests()
