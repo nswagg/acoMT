@@ -6,7 +6,7 @@ import numpy as np
 class PSO:
 
     def __init__(self, particles, velocities, fitness_function, targets,
-                 w=0.8, c_1=1, c_2=1, max_iter=100, prox_dist=.2, carry=0.1, auto_coef=True):
+                 w=0.8, c_1=1, c_2=1, max_iter=100, prox_dist=.1, carry=0.01, auto_coef=True):
         self.particles = particles
         self.carry_cap = carry  # how much a particle can "carry" from target
         self.velocities = velocities
@@ -14,11 +14,8 @@ class PSO:
         self.targets = targets  # list of [x,y,w] tuples where x,y are coords and w is a weight
 
         self.N = len(self.particles)
-        # self.w_init = 0 + w
         self.w = w
-        # self.c_1_0 = c_1 + 0
         self.c_1 = c_1
-        # self.c_2_0 = 0 + c_2
         self.c_2 = c_2
 
         self.auto_coef = auto_coef
@@ -77,7 +74,7 @@ class PSO:
             if self.targets[a][2] <= 0:
                 self.remove_target(a)
                 a = 0
-                # self.reset()
+                self.reset()
             else:
                 a += 1
             print(self.targets)
@@ -124,12 +121,13 @@ class PSO:
         elif len(self.targets) == 1:
             self.has_targets = False
 
-    '''def reset(self):
-        """If target decays away, reset the PSO to search for other targets."""
-        # self.w = 0 + self.w_init
-        self.iter = 0
-        # self.p_bests_values = self.fitness_function(self.particles)
+    def reset(self):
+        """If target decays away, reset the swarm to search for other targets."""
+        # randomize velocities again
+        self.velocities = ((np.random.random((self.N, 2)) - 0.5) / 10).copy()
+
+        self.p_bests = self.particles
+        self.p_bests_values = self.fitness_function(self.particles)
         self.g_best = self.p_bests[0]
         self.g_best_value = self.p_bests_values[0]
-        # randomize velocities again
-        # self.velocities = ((np.random.random((self.N, 2)) - 0.5) / 10).copy()'''
+        self.update_bests()

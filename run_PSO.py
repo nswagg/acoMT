@@ -7,9 +7,9 @@ from PSO import PSO
 from utils import plot_2d_pso, plot_3d_pso, make_gif_from_folder
 
 n_particles = 100
-T = [[4, -4, 10],
-     [3, 1, 2],
-     [-4, -2, .5]]
+T = [[4, -4, 6],
+     [3, 1, 1],
+     [-4, -2, 3]]
 
 # Make range grid
 X = np.arange(-5, 5, 0.05)
@@ -41,7 +41,7 @@ def fitness_function(pos):
 particles = np.random.uniform(0, 0, (n_particles, 2))
 velocities = (np.random.random((n_particles, 2)) - 0.5) / 10
 pso_1 = PSO(particles.copy(), velocities.copy(), fitness_function, T,
-            w=0.73, c_1=2.0, c_2=2.0, max_iter=60, auto_coef=False)
+            w=0.73, c_1=2.0, c_2=2.0, max_iter=100, auto_coef=False)
 
 root = 'src/'
 filename = '_tmp.gif'
