@@ -12,8 +12,8 @@ T = [[4, -4, 6],
      [-4, -2, 3]]
 
 # Make range grid
-X = np.arange(-5, 5, 0.05)
-Y = np.arange(-5, 5, 0.05)
+X = np.arange(-10, 10, 0.1)
+Y = np.arange(-10, 10, 0.1)
 meshgrid = np.meshgrid(X, Y)
 
 # where x0,y0 define the coordinate plane and x1,y1 define the target

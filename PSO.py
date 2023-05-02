@@ -71,7 +71,7 @@ class PSO:
             if count >= self.decay_num:  # requires "convergence" on the target before decay
                 self.targets[a][2] = self.targets[a][2] - (count * self.carry_cap) \
                     if self.targets[a][2] - (count * self.carry_cap) > 0 else 0
-            if self.targets[a][2] <= 0:
+            if self.targets[a][2] == 0 and self.has_targets:
                 self.remove_target(a)
                 a = 0
                 self.reset()
@@ -118,14 +118,14 @@ class PSO:
         if len(self.targets) > 1:
             del self.targets[index]
         # This should flag when attempting to remove target, but only 1 target left
-        elif len(self.targets) == 1:
+        else:  # if len(self.targets) == 1:
             self.has_targets = False
 
     def reset(self):
         """If target decays away, reset the swarm to search for other targets."""
         # randomize velocities again
-        self.velocities = ((np.random.random((self.N, 2)) - 0.5) / 10).copy()
-
+        self.velocities = ((np.random.random((self.N, 2)) - 0.5) / 10)
+        self.max_iter += 10
         self.p_bests = self.particles
         self.p_bests_values = self.fitness_function(self.particles)
         self.g_best = self.p_bests[0]
