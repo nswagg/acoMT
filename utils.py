@@ -32,8 +32,7 @@ cmap = cm.colors.LinearSegmentedColormap.from_list('Custom',
 def plot_2d_pso(meshgrid, function, particles=None, velocity=None, normalize=True, color='#000', ax=None):
     X_grid, Y_grid = meshgrid
     Z_grid = function(X_grid, Y_grid)
-    if Z_grid is None or len(Z_grid) == 0:
-        Z_grid = [[0 for col in range(200)] for row in range(200)]
+
     # get coordinates and velocity arrays
     if particles is not None:
         X, Y = particles.swapaxes(0, 1)
@@ -68,7 +67,6 @@ def plot_2d_pso(meshgrid, function, particles=None, velocity=None, normalize=Tru
 def plot_3d_pso(meshgrid, function, particles=None, velocity=None, normalize=True, color='#000', ax=None):
     X_grid, Y_grid = meshgrid
     Z_grid = function(X_grid, Y_grid)
-
     # get coordinates and velocity arrays
     if particles is not None:
         X, Y = particles.swapaxes(0, 1)
