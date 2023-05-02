@@ -24,7 +24,7 @@ f = lambda x0, y0, x1, y1, w: (((x0 - x1) ** 2 + (y0 - y1) ** 2) ** 0.5) - w
 def f0(x, y):
     """ minimization function for n targets"""
     func_list = []
-    a = 0
+    """a = 0
     while a < len(T):
         if T[a][2] <= 0:
             del T[a]
@@ -32,7 +32,9 @@ def f0(x, y):
         else:
             func_list.append(f(x, y, T[a][0], T[a][1], T[a][2]))
             a += 1
-        print(T)
+        print(T)"""
+    for a in range(len(T)):
+        func_list.append(f(x, y, T[a][0], T[a][1], T[a][2]))
 
     min_list = func_list[0] if len(func_list) > 0 else np.zeros((200, 200))
     for b in range(0, len(func_list)):
