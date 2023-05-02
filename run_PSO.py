@@ -7,9 +7,9 @@ from PSO import PSO
 from utils import plot_2d_pso, plot_3d_pso, make_gif_from_folder
 
 n_particles = 100
-T = [[4, -4, 6],
+T = [[4, -4, 20],
      [3, 1, 2],
-     [-4, -2, .5]]
+     [-4, -2, 5]]
 
 # Make range grid
 X = np.arange(-5, 5, 0.05)
@@ -20,13 +20,20 @@ meshgrid = np.meshgrid(X, Y)
 f = lambda x0, y0, x1, y1, w: (((x0 - x1) ** 2 + (y0 - y1) ** 2) ** 0.5) - w
 
 
+"""def f(x0, y0, x1, y1, w):
+    if w != 0:
+        return (((x0 - x1) ** 2 + (y0 - y1) ** 2) ** 0.5) - w
+    return 0"""
+
+
 def f0(x, y):
     """ minimization function for n targets"""
     func_list = []
     for a in range(len(T)):
-        func_list.append(f(x, y, T[a][0], T[a][1], T[a][2]))
+        if T[a][2] != 0:
+            func_list.append(f(x, y, T[a][0], T[a][1], T[a][2]))
 
-    min_list = func_list[0]
+    min_list = func_list[0] if func_list[0] is not None else None
     for b in range(1, len(func_list)):
         min_list = np.minimum(min_list, func_list[b])
 
@@ -38,11 +45,12 @@ def fitness_function(pos):
     return f0(x, y)
 
 
-particles = np.random.uniform(-5, 5, (n_particles, 2))
+# particles = np.random.uniform(-5, 5, (n_particles, 2))
+particles = np.random.uniform(0, 0, (n_particles, 2))
 velocities = (np.random.random((n_particles, 2)) - 0.5) / 10
-
+print("0: " + str(id(T)))
 pso_1 = PSO(particles.copy(), velocities.copy(), fitness_function, T,
-            w=0.73, c_1=2.0, c_2=2.0, max_iter=50, auto_coef=False)
+            w=0.73, c_1=2.0, c_2=2.0, max_iter=100, auto_coef=False)
 
 root = 'src/'
 filename = '_tmp.gif'
@@ -64,7 +72,6 @@ while pso_1.next():
     ax = fig.add_subplot(1, 3, 1)
     plot_2d_pso(meshgrid, f0, pso_1.particles, pso_1.velocities, ax=ax)
     ax.set_title(str(pso_1))
-
     if save_path is None:
         plt.show()
     else:
