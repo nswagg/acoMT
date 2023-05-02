@@ -7,9 +7,10 @@ from PSO import PSO
 from utils import plot_2d_pso, plot_3d_pso, make_gif_from_folder
 
 n_particles = 100
-T = [[4, -4, 20],
+"""T = [[4, -4, 5],
      [3, 1, 2],
-     [-4, -2, 5]]
+     [-4, -2, .5]]"""
+T = [[3, 1, 2]]
 
 # Make range grid
 X = np.arange(-5, 5, 0.05)
@@ -20,18 +21,12 @@ meshgrid = np.meshgrid(X, Y)
 f = lambda x0, y0, x1, y1, w: (((x0 - x1) ** 2 + (y0 - y1) ** 2) ** 0.5) - w
 
 
-"""def f(x0, y0, x1, y1, w):
-    if w != 0:
-        return (((x0 - x1) ** 2 + (y0 - y1) ** 2) ** 0.5) - w
-    return 0"""
-
-
 def f0(x, y):
     """ minimization function for n targets"""
     func_list = []
     a = 0
     while a < len(T):
-        if T[a][2] == 0:
+        if T[a][2] <= 0:
             del T[a]
             a = 0
         else:
@@ -39,10 +34,9 @@ def f0(x, y):
             a += 1
         print(T)
 
-    min_list = func_list[0] if func_list[0] is not None else None
-    for b in range(1, len(func_list)):
+    min_list = func_list[0] if len(func_list) > 0 else np.zeros((200, 200))
+    for b in range(0, len(func_list)):
         min_list = np.minimum(min_list, func_list[b])
-
     return min_list
 
 

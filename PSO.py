@@ -6,7 +6,7 @@ import numpy as np
 class PSO:
 
     def __init__(self, particles, velocities, fitness_function, targets,
-                 w=0.8, c_1=1, c_2=1, max_iter=100, prox_dist=.2, carry=0.05, auto_coef=True):
+                 w=0.8, c_1=1, c_2=1, max_iter=100, prox_dist=.2, carry=0.1, auto_coef=True):
         self.particles = particles
         self.carry_cap = carry  # how much a particle can "carry" from target
         self.velocities = velocities
@@ -37,6 +37,7 @@ class PSO:
 
         self.iter = 0
         self.is_running = True
+        self.has_targets = len(self.targets) > 0
         self.update_coef()
 
     def __str__(self):
@@ -45,13 +46,13 @@ class PSO:
     def next(self):
         if self.iter > 0:
             self.move_particles()
-            self.update_bests()
-
-            self.update_coef()
             self.update_target()
+            if self.has_targets:
+                self.update_bests()
+                self.update_coef()
 
         self.iter += 1
-        self.is_running = self.is_running and self.iter < self.max_iter and len(self.targets) > 0
+        self.is_running = self.is_running and self.iter < self.max_iter and self.has_targets
         return self.is_running
 
     def update_coef(self):
@@ -66,18 +67,20 @@ class PSO:
         """defines actions taken when targets are updating over time"""
         """For each particle within the target's range, increase the counter and decay the target
            weight relative to each particle's carrying capacity."""
-        delete_target = []
-        for t in self.targets:
-            count = 0
-            for p in self.particles:
-                euclid = (p[0] - t[0]) ** 2 + (p[1] - t[1]) ** 2
-                if euclid < self.decay_rad:
-                    count += 1
-            if count >= self.decay_num:  # requires "convergence" on the target before decay
-                t[2] = t[2] - (count * self.carry_cap) if t[2] - (count * self.carry_cap) > 0 else 0
-            if t[2] == 0:
-                # self.remove_target(t)
-                self.reset()
+        if self.has_targets:
+            for t in self.targets:
+                count = 0
+                for p in self.particles:
+                    euclid = (p[0] - t[0]) ** 2 + (p[1] - t[1]) ** 2
+                    if euclid < self.decay_rad:
+                        count += 1
+                if count >= self.decay_num:  # requires "convergence" on the target before decay
+                    t[2] = t[2] - (count * self.carry_cap) if t[2] - (count * self.carry_cap) > 0 else 0
+                if t[2] == 0 and len(self.targets) > 1:
+                    self.remove_target(t)
+                    self.reset()
+        if len(self.targets) == 0:
+            self.has_targets = False
 
     def move_particles(self):
 
@@ -119,9 +122,10 @@ class PSO:
 
     def reset(self):
         """If target decays away, reset the PSO to search for other targets."""
-        self.c_1 = 0 + self.c_1_0
-        self.c_2 = 0 + self.c_2_0
         self.w = 0 + self.w_init
         self.iter = 0
+        # self.p_bests_values = self.fitness_function(self.particles)
+        self.g_best = self.p_bests[0]
+        self.g_best_value = self.p_bests_values[0]
         # randomize velocities again
         self.velocities = (np.random.random((self.N, 2)) - 0.5) / 10
