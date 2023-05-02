@@ -1,15 +1,16 @@
 # from https://towardsdatascience.com/particle-swarm-optimization-visually-explained-46289eeb2e14
 import numpy as np
 
+f = lambda x0, y0, x1, y1, w: (((x0 - x1) ** 2 + (y0 - y1) ** 2) ** 0.5) - w
 
 class PSO:
 
-    def __init__(self, particles, velocities, fitness_function, targets,
+    def __init__(self, particles, velocities, targets,
                  w=0.8, c_1=1, c_2=1, max_iter=100, prox_dist=.1, carry=0.01, auto_coef=True):
         self.particles = particles
         self.carry_cap = carry  # how much a particle can "carry" from target
         self.velocities = velocities
-        self.fitness_function = fitness_function
+        # self.fitness_function = fitness_function
         self.targets = targets  # list of TARGET objs
 
         self.N = len(self.particles)
@@ -36,6 +37,21 @@ class PSO:
 
     def __str__(self):
         return f'[{self.iter}/{self.max_iter}] $w$:{self.w:.3f} - $c_1$:{self.c_1:.3f} - $c_2$:{self.c_2:.3f}'
+
+    def fitness_function(self, pos):
+        x, y = pos.swapaxes(0, 1)
+        return self.f0(x, y)
+
+    def f0(self, x, y):
+        """ minimization function for n targets"""
+        func_list = []
+        for a in range(len(self.targets)):
+            func_list.append(f(x, y, self.targets[a].x, self.targets[a].y, self.targets[a].weight))
+
+        min_list = func_list[0] if len(func_list) > 0 else np.zeros((200, 200))
+        for b in range(0, len(func_list)):
+            min_list = np.minimum(min_list, func_list[b])
+        return min_list
 
     def next(self):
         if self.iter > 0:
