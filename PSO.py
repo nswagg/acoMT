@@ -35,7 +35,7 @@ class PSO:
 
         self.iter = 0
         self.is_running = True
-        # self.has_targets = len(self.targets) > 0
+        self.has_targets = len(self.targets) > 0
         self.update_coef()
 
     def __str__(self):
@@ -49,7 +49,7 @@ class PSO:
             self.update_target()
 
         self.iter += 1
-        self.is_running = self.is_running and self.iter < self.max_iter  # and self.has_targets
+        self.is_running = self.is_running and self.has_targets and self.iter < self.max_iter
         return self.is_running
 
     def update_coef(self):
@@ -64,17 +64,23 @@ class PSO:
         """defines actions taken when targets are updating over time"""
         """For each particle within the target's range, increase the counter and decay the target
            weight relative to each particle's carrying capacity."""
-        for t in self.targets:
+        a = 0
+        while a < len(self.targets):
             count = 0
             for p in self.particles:
-                euclid = (p[0] - t[0]) ** 2 + (p[1] - t[1]) ** 2
+                euclid = (p[0] - self.targets[a][0]) ** 2 + (p[1] - self.targets[a][1]) ** 2
                 if euclid < self.decay_rad:
                     count += 1
             if count >= self.decay_num:  # requires "convergence" on the target before decay
-                t[2] = t[2] - (count * self.carry_cap) if t[2] - (count * self.carry_cap) > 0 else 0
-            """if t[2] <= 0:
-                self.remove_target(t)
-                # self.reset()"""
+                self.targets[a][2] = self.targets[a][2] - (count * self.carry_cap) \
+                    if self.targets[a][2] - (count * self.carry_cap) > 0 else 0
+            if self.targets[a][2] <= 0:
+                self.remove_target(a)
+                a = 0
+                # self.reset()
+            else:
+                a += 1
+            print(self.targets)
 
     def move_particles(self):
 
@@ -111,12 +117,12 @@ class PSO:
                     self.g_best_value = fits[i]
                     self.g_best = self.particles[i]
 
-    """def remove_target(self, target):
+    def remove_target(self, index):
         if len(self.targets) > 1:
-            self.targets = [t for t in self.targets if t != target]
+            del self.targets[index]
         # This should flag when attempting to remove target, but only 1 target left
         elif len(self.targets) == 1:
-            self.has_targets = False"""
+            self.has_targets = False
 
     '''def reset(self):
         """If target decays away, reset the PSO to search for other targets."""

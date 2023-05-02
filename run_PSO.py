@@ -10,7 +10,6 @@ n_particles = 100
 T = [[4, -4, 10],
      [3, 1, 2],
      [-4, -2, .5]]
-"""T = [[3, 1, 2]]"""
 
 # Make range grid
 X = np.arange(-5, 5, 0.05)
@@ -24,15 +23,6 @@ f = lambda x0, y0, x1, y1, w: (((x0 - x1) ** 2 + (y0 - y1) ** 2) ** 0.5) - w
 def f0(x, y):
     """ minimization function for n targets"""
     func_list = []
-    """a = 0
-    while a < len(T):
-        if T[a][2] <= 0:
-            del T[a]
-            a = 0
-        else:
-            func_list.append(f(x, y, T[a][0], T[a][1], T[a][2]))
-            a += 1
-        print(T)"""
     for a in range(len(T)):
         func_list.append(f(x, y, T[a][0], T[a][1], T[a][2]))
 
