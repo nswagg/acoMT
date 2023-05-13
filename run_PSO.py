@@ -35,7 +35,7 @@ def main():
     pso_1 = PSO(particles.copy(), velocities.copy(), T0,
                 w=0.25, c_1=2.0, c_2=2.0, max_iter=100, auto_coef=False)
     pso_2 = PSO(particles.copy(), velocities.copy(), T1,
-                w=0.73, c_1=2.0, c_2=2.0, max_iter=100, auto_coef=True)
+                w=0.73, c_1=2.0, c_2=2.0, max_iter=100, auto_coef=False)
     pso_3 = PSO(particles.copy(), velocities.copy(), T2,
                 w=0.9, c_1=2.0, c_2=2.0, max_iter=100, auto_coef=False)
 
@@ -52,7 +52,7 @@ def main():
 
     while pso_1.next():
         pso_2.next()
-        """pso_3.next()"""
+        pso_3.next()
         fig.clear()
         save_path = None if not save else os.path.join(tmp_dir, f'{pso_1.iter:05d}.png')
 

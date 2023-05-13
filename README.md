@@ -3,7 +3,7 @@ Particle Swarm Optimization algorithm experiment with moving/degrading target
 Was initially designed to implement Ant Colony Optimization, but has been refactored for particle swarm with targets 
 decaying on convergence (inversely proportional to swarm velocity). Decay rate defined as `carry_capacity` of particles
 `
-# defines the number of particles required to be in proximity to target for it to decay
+"""defines the number of particles required to be in proximity to target for it to decay"""
 self.particles_for_decay = self.NumParticles * (1 - self.w) if 0 < w <= 1 else self.NumParticles
 `
 ## Demo
